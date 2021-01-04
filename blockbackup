@@ -163,9 +163,9 @@ while true; do
 	    #the same - remove and make hardlink to old one
 	    rm "${TODAY}/${NEWDIR}/${NEWNAME}"
 	    if [[ $SKIPSAME -eq 0 ]]; then
-		ln -v "$SYMLINK" "${BASE}/${NEWDIR}/${NEWNAME}${ZEXT}" "${TODAY}/${NEWDIR}/${NEWNAME}${ZEXT}"
+		ln -v $SYMLINK "${BASE}/${NEWDIR}/${NEWNAME}${ZEXT}" "${TODAY}/${NEWDIR}/${NEWNAME}${ZEXT}"
 		if [ ${DO_MD5} -eq 1 ]; then
-		    ln "$SYMLINK" "${BASE}/${NEWDIR}/${NEWNAME}.md5" "${TODAY}/${NEWDIR}/${NEWNAME}.md5"
+		    ln $SYMLINK "${BASE}/${NEWDIR}/${NEWNAME}.md5" "${TODAY}/${NEWDIR}/${NEWNAME}.md5"
 		fi
 	    fi
 	else
