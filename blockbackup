@@ -34,6 +34,7 @@ NOUPDATE=0
 SYMLINK=""
 SKIPSAME=0
 IGNORE_ERR=0
+MD5EMPTY="d41d8cd98f00b204e9800998ecf8427e"
 
 function usage() {
     echo "ERROR: unknown option/paramter"
@@ -175,6 +176,7 @@ while true; do
 	fi
 	STARTCHUNK=$(( $STARTCHUNK+1 ))
 	[ "${ENDCHUNK}" ] && [ ${STARTCHUNK} -gt ${ENDCHUNK} ] && break
+	echo "${MD5EMPTY}" |cmp "${TODAY}/${NEWDIR}/${NEWNAME}.md5" 2> /dev/null 1>&2 && break
     fi
 done
 
