@@ -25,19 +25,17 @@ USE_ZIP=0
 SOURCE=
 DEST=
 CHUNK=
-#DO_MD5=0
 ZCAT="cat"
 ZEXT=
 FAST=0
 
 
 function usage() {
-    echo "ERROR: unknown option/paramter"
+    echo "ERROR: unknown option/parameter"
     echo "Usage: blockrestore -s directory -d device [-c chunk] [-f]"
     echo "	-s|--source	source directory"
     echo "	-d|--dest	destination device"
     echo "	-c|--chunk	chunk size (default=autodetect)"
-    #echo "	-m|--md5	check md5 for every chunk"
     echo "	-f|--fast	run in fast mode (could not work in some circumstances!)"
     exit 1
 }
@@ -66,9 +64,6 @@ while true; do
 	    shift
 	    CHUNK=$1
 	    ;;
-	#-m|--md5)
-	#    DO_MD5=1
-	#    ;;
 	-f|--fast)
 	    FAST=1
 	    ;;

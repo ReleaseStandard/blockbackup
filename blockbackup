@@ -25,7 +25,6 @@ USE_ZIP=0
 SOURCE=
 DEST=
 CHUNK=1M
-DO_MD5=1
 ZCAT=cat
 ZEXT=
 NUMZIPS=4
@@ -45,7 +44,6 @@ function usage() {
     echo "	-za|--zip-after		compress new blocks at the end of process"
     echo "	-n|--num-zips N		run maximum N zip processess in parallel (default=4)"
     echo "	-c|--chunk N		set chunk size to N (default=1M)"
-    echo "	-nm|--no-md5		don't generate md5 for every chunk"
     echo "	-sc|--start-chunk N	start dump from chunk N (default=0)"
     echo "	-ec|--end-chunk N	end dump at chunk N (default=end of device)"
     echo "	-nu|--no-update		don't update lastsync link at the end"
@@ -88,9 +86,6 @@ while true; do
 	-c|--chunk)
 	    shift
 	    CHUNK=$1
-	    ;;
-	-nm|--no-md5)
-	    DO_MD5=0
 	    ;;
 	-n|--num-zips)
 	    shift
@@ -150,7 +145,7 @@ while true; do
     echo -n "${NEWNAME} : "
     NEWDIR=${NEWNAME:0:5}
     mkdir -p "${TODAY}/${NEWDIR}"
-    
+
     #read chunk
     dd if="${SOURCE}" of="${TODAY}/${NEWDIR}/${NEWNAME}" count=1 bs=${CHUNK} skip=${STARTCHUNK}  1>/dev/null 2>&1
     if [ $? -ne 0 ] && [[ $IGNORE_ERR -eq 0 ]]; then
@@ -158,22 +153,17 @@ while true; do
 	echo "end of source or error"
 	break
     else
-	${ZCAT} "${BASE}/${NEWDIR}/${NEWNAME}${ZEXT}" 2>/dev/null|cmp "${TODAY}/${NEWDIR}/${NEWNAME}" 1>/dev/null 2>&1
+	md5sum "${TODAY}/${NEWDIR}/${NEWNAME}" |sed 's/[ ]\+[^ ]\+$//g' >"${TODAY}/${NEWDIR}/${NEWNAME}.md5"
+	cmp "${BASE}/${NEWDIR}/${NEWNAME}.md5" "${TODAY}/${NEWDIR}/${NEWNAME}.md5"
 	if [ $? -eq 0 ]; then
 	    #the same - remove and make hardlink to old one
 	    rm "${TODAY}/${NEWDIR}/${NEWNAME}"
 	    if [[ $SKIPSAME -eq 0 ]]; then
 		ln -v $SYMLINK "${BASE}/${NEWDIR}/${NEWNAME}${ZEXT}" "${TODAY}/${NEWDIR}/${NEWNAME}${ZEXT}"
-		if [ ${DO_MD5} -eq 1 ]; then
-		    ln $SYMLINK "${BASE}/${NEWDIR}/${NEWNAME}.md5" "${TODAY}/${NEWDIR}/${NEWNAME}.md5"
-		fi
 	    fi
 	else
 	    #not the same - leave it
 	    echo "new ${TODAY}/${NEWDIR}/${NEWNAME}"
-	    if [ ${DO_MD5} -eq 1 ]; then
-		md5sum "${TODAY}/${NEWDIR}/${NEWNAME}" >"${TODAY}/${NEWDIR}/${NEWNAME}.md5"
-	    fi
 	    if [ ${USE_ZIP} -eq 1 ]; then
 		#zip instantly
 		if [ $(jobs|wc -l) -lt ${NUMZIPS} ]; then
